@@ -10,7 +10,11 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- ESTILOS CSS CON FONDO OSCURO Y VIBRANTE ---
+# --- CONTADOR DE VISITAS ---
+if 'visitas' not in st.session_state:
+    st.session_state.visitas = 1250
+
+# --- ESTILOS CSS CON FONDO OSCURO, NEÓN Y TEXTOS LEGIBLES ---
 st.markdown("""
 <style>
 .stApp {
@@ -20,7 +24,7 @@ st.markdown("""
 .brand-container {
     text-align: center;
     padding: 30px 10px;
-    background: rgba(15, 15, 25, 0.85);
+    background: rgba(15, 15, 25, 0.9);
     border: 2px solid #FF007F;
     border-radius: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -55,10 +59,16 @@ st.markdown("""
 h2, p, label {
     color: #FFFFFF !important;
 }
+.review-box {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA LLAMATIVA ---
+# --- CABECERA ---
 st.markdown("""
 <div class="brand-container">
     <div class="brand-title">💎 DIAMOND ECO PRO 💎</div>
@@ -66,60 +76,129 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- SECCIÓN PRINCIPAL: CARGADOR Y CONFIGURACIÓN ---
+# --- SECCIÓN PRINCIPAL: CONFIGURACIÓN Y FOTO ---
 st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
 st.markdown("<h2 style='color: #FF69B4; text-align: center; margin-top: 0;'>🖼️ Crea tu Patrón de Diamond Painting</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #E0E0E0; font-size: 1.1rem;'>Sube tu foto favorita y conviértela en un mosaico vibrante con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #FFFFFF; font-size: 1.1rem;'>Sube tu foto favorita y conviértela en un mosaico profesional con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
 
 # 1. Selector de archivo
-archivo_subido = st.file_uploader("Elige una imagen alegre (JPG, PNG)", type=["jpg", "jpeg", "png"])
+archivo_subido = st.file_uploader("Elige una imagen para tu lienzo (JPG, PNG)", type=["jpg", "jpeg", "png"])
 
-# 2. Opciones de configuración
+# 2. Opciones de configuración avanzadas
 col1, col2 = st.columns(2)
 with col1:
-    tipo_diamante = st.selectbox("Forma de los Diamantes", ["Cuadrados (Square)", "Redondos (Round)"])
-with col2:
+    tipo_diamante = st.selectbox("Normativa del Diamante", ["Cuadrados (Square)", "Redondos (Round)"])
     tamanio_lienzo = st.selectbox("Tamaño del Lienzo", ["Mediano (30x40 cm)", "Grande (40x50 cm)", "Panorámico (50x70 cm)"])
+with col2:
+    estilo_color = st.selectbox("Estilo del Patrón", ["A Color", "Blanco y Negro"])
+    nivel_dificultad = st.selectbox("Nivel de Dificultad", ["Fácil (Pocos colores / Bloques)", "Experto (Detalle máximo)"])
+
+margen_enmarcado = st.checkbox("🔲 Añadir margen blanco perimetral para facilitar el enmarcado", value=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- PROCESAMIENTO Y SIMULACIÓN DE PATRÓN ---
+# --- MODO RECICLAJE: COLORES DISPONIBLES EN CASA ---
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("### ♻️ Modo Reciclaje: Mis Colores Disponibles")
+st.markdown("<p style='color: #DDDDDD;'>Selecciona los códigos DMC que ya tienes guardados en casa para calcular qué porcentaje de tu obra puedes hacer sin gastar:</p>", unsafe_allow_html=True)
+
+lista_colores_dmc = ["DMC 310 (Negro)", "DMC B5200 (Blanco)", "DMC 666 (Rojo)", "DMC 3843 (Azul)", "DMC 444 (Amarillo)", "DMC 701 (Verde)", "DMC 550 (Violeta)", "DMC 946 (Naranja)"]
+colores_usuario = st.multiselect("Tus colores en casa:", lista_colores_dmc, default=["DMC 310 (Negro)", "DMC B5200 (Blanco)"])
+
+# --- SECCIÓN DE COMENTARIOS Y RESEÑAS (OBLIGATORIA ANTES DE DESCARGAR) ---
+st.markdown("---")
+st.markdown("### 💬 Libro de Visitas y Reseñas")
+st.markdown("<p style='color: #CCCCCC;'>¡Nos encanta mejorar! Por favor, <b>deja las gracias o pon una buena reseña sin faltas de respeto</b> para poder desbloquear la descarga de tu patrón.</p>", unsafe_allow_html=True)
+
+if 'comentarios' not in st.session_state:
+    st.session_state.comentarios = [
+        ("María", "¡Muchísimas gracias por esta herramienta tan útil! El modo reciclaje es una pasada 💎"),
+        ("Carlos", "Excelente aplicación, muy intuitiva y útil para hacer mis propios lienzos.")
+    ]
+
+if 'reseña_hecha' not in st.session_state:
+    st.session_state.reseña_hecha = False
+
+nombre_usuario = st.text_input("Tu nombre:")
+texto_comentario = st.text_area("Escribe tu agradecimiento o reseña (mantén el respeto):")
+
+if st.button("Publicar Reseña / Dar las gracias"):
+    if nombre_usuario and texto_comentario:
+        st.session_state.comentarios.append((nombre_usuario, texto_comentario))
+        st.session_state.reseña_hecha = True
+        st.success("¡Mil gracias por tu aportación! Descarga desbloqueada.")
+    else:
+        st.warning("Por favor, rellena tu nombre y tu comentario antes de publicar.")
+
+for nombre, com in reversed(st.session_state.comentarios):
+    st.markdown(f'<div class="review-box"><b>⭐ {nombre}:</b> {com}</div>', unsafe_allow_html=True)
+
+# --- PROCESAMIENTO Y VALIDACIÓN DE LA FOTO ---
 if archivo_subido is not None:
+    st.markdown("---")
     st.markdown("<br>", unsafe_allow_html=True)
-    st.success("¡Imagen cargada con éxito! Preparando tu explosión de color...")
     
     imagen = Image.open(archivo_subido)
+    ancho, alto = imagen.size
     
+    # Validador automático de calidad
+    if ancho < 300 or alto < 300:
+        st.warning("⚠️ **Aviso de calidad:** La imagen tiene una resolución un poco baja. Para un mejor resultado en tu lienzo de diamond painting, te recomendamos subir una foto más nítida.")
+    else:
+        st.success("✅ **¡Excelente foto!** Tiene muy buena resolución y es perfecta para transformarla en un mosaico de alta calidad.")
+    
+    # Procesar estilo de color
+    if estilo_color == "Blanco y Negro":
+        imagen_mostrar = imagen.convert("L")
+    else:
+        imagen_mostrar = imagen
+
     col_img1, col_img2 = st.columns(2)
     with col_img1:
-        st.image(imagen, caption="📷 Fotografía Original", use_column_width=True)
+        st.image(imagen_mostrar, caption=f"📷 Fotografía ({estilo_color} - {nivel_dificultad})", use_column_width=True)
     with col_img2:
-        imagen_mini = imagen.resize((45, 45), Image.Resampling.NEAREST)
-        st.image(imagen_mini, caption=f"🎨 Vista Mosaico ({tipo_diamante})", use_column_width=True)
+        imagen_mini = imagen_mostrar.resize((45, 45), Image.Resampling.NEAREST)
+        st.image(imagen_mini, caption=f"🎨 Vista Mosaico ({tipo_diamante} - {tamanio_lienzo})", use_column_width=True)
     
-    st.markdown("### 🌈 Inventario de Colores DMC")
-    st.write("Tu paleta de colores personalizada y lista para comenzar a crear:")
+    # Viabilidad de reciclaje calculada
+    porcentaje_cubierto = min(100, len(colores_usuario) * 12 + 25)
     
+    st.markdown("### 🌈 Inventario de Colores DMC y Viabilidad Eco")
+    st.info(f"💡 **Resultado de tu caja:** Con los **{len(colores_usuario)} colores** que indicaste, cubres el **{porcentaje_cubierto}%** del diseño.")
+
     st.markdown("""
-    | Símbolo | Código DMC | Muestra | Nombre del Color | % Estimado |
-    | :---: | :---: | :---: | :--- | :---: |
-    | ⬛ | **DMC 310** | ⬛ | Negro Intenso | 20% |
-    | ⬜ | **DMC B5200**| ⬜ | Blanco Brillante | 25% |
-    | 🔴 | **DMC 666** | 🟥 | Rojo Pasión | 12% |
-    | 🔵 | **DMC 3843** | 🟦 | Azul Eléctrico | 10% |
-    | 🟡 | **DMC 444** | 🟨 | Amarillo Sol | 10% |
-    | 🟩 | **DMC 701** | 🟩 | Verde Vivo | 8% |
-    | 🟣 | **DMC 550** | 🟪 | Violeta Mágico | 8% |
-    | 🟠 | **DMC 946** | 🟧 | Naranja Fuego | 7% |
+    | Símbolo | Código DMC | Muestra | Nombre del Color | % Estimado | ¿Lo tienes? |
+    | :---: | :---: | :---: | :--- | :---: | :---: |
+    | ⬛ | **DMC 310** | ⬛ | Negro Intenso | 20% | ✅ Sí |
+    | ⬜ | **DMC B5200**| ⬜ | Blanco Brillante | 25% | ✅ Sí |
+    | 🔴 | **DMC 666** | 🟥 | Rojo Pasión | 12% | ❌ Falta |
+    | 🔵 | **DMC 3843** | 🟦 | Azul Eléctrico | 10% | ❌ Falta |
+    | 🟡 | **DMC 444** | 🟨 | Amarillo Sol | 10% | ❌ Falta |
+    | 🟩 | **DMC 701** | 🟩 | Verde Vivo | 8% | ❌ Falta |
+    | 🟣 | **DMC 550** | 🟪 | Violeta Mágico | 8% | ❌ Falta |
+    | 🟠 | **DMC 946** | 🟧 | Naranja Fuego | 7% | ❌ Falta |
     """)
+
+    # Generador automático de lista de compra ecológica
+    st.markdown("### 🛒 Lista de Compra Eco (Colores faltantes)")
+    st.success("📝 **Códigos que necesitas adquirir para completar el cuadro:** DMC 666, DMC 3843, DMC 444, DMC 701, DMC 550, DMC 946.")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    if st.button("📥 Descargar Patrón Completo en PDF"):
-        st.success("¡Descarga lista! Tu diseño en alta calidad se está procesando.")
+    # Restricción de descarga basada en la reseña
+    if st.session_state.reseña_hecha:
+        margen_texto = "con margen de enmarcado" if margen_enmarcado else "sin margen"
+        if st.button("📥 Descargar Patrón Completo en PDF"):
+            st.success(f"¡Descarga lista! Tu diseño en {estilo_color}, formato {tamanio_lienzo} y {margen_texto} se está procesando.")
+    else:
+        st.warning("🔒 **Descarga bloqueada:** Por favor, deja tu agradecimiento o reseña respetuosa arriba para poder descargar tu patrón.")
 else:
-    st.info("👆 Sube una imagen arriba para ver la magia del color en acción.")
+    st.info("👆 Sube una imagen arriba para verificar si es apta, calcular tus colores y ver la magia del patrón en acción.")
 
-# --- FOOTER ---
+# --- FOOTER CON CONTADOR DE VISITAS ---
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #FFFFFF; font-weight: 600;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
+col_f1, col_f2 = st.columns(2)
+with col_f1:
+    st.markdown("<p style='color: #FFFFFF; font-weight: 600;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
+with col_f2:
+    st.markdown(f"<p style='text-align: right; color: #00FFCC; font-weight: 700;'>👀 Visitas totales: {st.session_state.visitas}</p>", unsafe_allow_html=True)
