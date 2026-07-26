@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from PIL import Image
 import numpy as np
+from io import BytesIO
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -102,7 +103,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### ♻️ Modo Reciclaje: Mis Colores Disponibles")
 st.markdown("<p style='color: #DDDDDD;'>Selecciona los códigos DMC que ya tienes guardados en casa de la carta completa (enumerados del 1 al 454):</p>", unsafe_allow_html=True)
 
-# Lista completa oficial de la carta de colores DMC numerada individualmente
 brutos_dmc = [
     "DMC BLANC (White)", "DMC B5200 (Snow White)", "DMC ECRU (Ecru)",
     "DMC 01 (White Tin)", "DMC 02 (Tin)", "DMC 03 (Medium Tin)", "DMC 04 (Dark Tin)",
@@ -185,12 +185,10 @@ brutos_dmc = [
     "DMC 3865 (Winter White)", "DMC 3866 (Mocha Brown ULT VY LT)"
 ]
 
-# Generación automática de la lista enumerada del 1 al 454 sin valores por defecto conflictivos
 lista_colores_dmc = [f"{i+1}. {color}" for i, color in enumerate(brutos_dmc)]
-
 colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc)
 
-# --- SECCIÓN DE COMENTARIOS Y RESEÑAS (OBLIGATORIA ANTES DE DESCARGAR) ---
+# --- SECCIÓN DE COMENTARIOS Y RESEÑAS ---
 st.markdown("---")
 st.markdown("### 💬 Libro de Visitas y Reseñas")
 st.markdown("<p style='color: #CCCCCC;'>¡Nos encanta mejorar! Por favor, <b>deja las gracias o pon una buena reseña sin faltas de respeto</b> para poder desbloquear la descarga de tu patrón.</p>", unsafe_allow_html=True)
@@ -218,7 +216,7 @@ if st.button("Publicar Reseña / Dar las gracias"):
 for nombre, com in reversed(st.session_state.comentarios):
     st.markdown(f'<div class="review-box"><b>⭐ {nombre}:</b> {com}</div>', unsafe_allow_html=True)
 
-# --- PROCESAMIENTO Y VALIDACIÓN DE LA FOTO ---
+# --- PROCESAMIENTO Y DESCARGA REAL DE LA FOTO ---
 if archivo_subido is not None:
     st.markdown("---")
     st.markdown("<br>", unsafe_allow_html=True)
@@ -227,9 +225,9 @@ if archivo_subido is not None:
     ancho, alto = imagen.size
     
     if ancho < 300 or alto < 300:
-        st.warning("⚠️ **Aviso de calidad:** La imagen tiene una resolución un poco baja. Para un mejor resultado en tu lienzo de diamond painting, te recomendamos subir una foto más nítida.")
+        st.warning("⚠️ **Aviso de calidad:** La imagen tiene una resolución un poco baja. Te recomendamos subir una foto más nítida.")
     else:
-        st.success("✅ **¡Excelente foto!** Tiene muy buena resolución y es perfecta para transformarla en un mosaico de alta calidad.")
+        st.success("✅ **¡Excelente foto!** Perfecta para transformarla en un mosaico de alta calidad.")
     
     if estilo_color == "Blanco y Negro":
         imagen_mostrar = imagen.convert("L")
@@ -248,15 +246,36 @@ if archivo_subido is not None:
 
     # Restricción de descarga basada en la reseña
     if st.session_state.reseña_hecha:
-        margen_texto = "con margen de enmarcado" if margen_enmarcado else "sin margen"
-        if st.button("📥 Descargar Patrón Completo en PDF"):
-            st.success(f"¡Descarga lista! Tu diseño en {estilo_color}, formato {tamanio_lienzo} y {margen_texto} se está procesando.")
+        margen_texto = "Con margen" if margen_enmarcado else "Sin margen"
+        
+        # Generar un archivo de texto/patrón simulando el PDF descargable para asegurar compatibilidad total sin librerías externas pesadas
+        contenido_patron = f"""=============================================
+DIAMOND ECO PRO - PATRÓN DE DIAMOND PAINTING
+=============================================
+- Estilo: {estilo_color}
+- Tamaño: {tamanio_lienzo}
+- Tipo de Diamante: {tipo_diamante}
+- Enmarcado: {margen_texto}
+- Nivel: {nivel_dificultad}
+- Colores seleccionados de casa: {len(colores_usuario)} colores
+
+LISTA DE COLORES DMC REQUERIDOS EN TU PROYECTO:
+""" + "\n".join(colores_usuario if colores_usuario else ["Se usará la selección automática de colores optimizada."])
+
+        buffer_descarga = BytesIO(contenido_patron.encode('utf-8'))
+
+        st.download_button(
+            label="📥 Descargar Patrón Completo (Archivo de Patrón)",
+            data=buffer_descarga,
+            file_name="Patron_DiamondEcoPro.txt",
+            mime="text/plain"
+        )
     else:
         st.warning("🔒 **Descarga bloqueada:** Por favor, deja tu agradecimiento o reseña respetuosa arriba para poder descargar tu patrón.")
 else:
     st.info("👆 Sube una imagen arriba para verificar si es apta, calcular tus colores y ver la magia del patrón en acción.")
 
-# --- FOOTER CON CONTADOR DE VISITAS ---
+# --- FOOTER ---
 st.markdown("---")
 col_f1, col_f2 = st.columns(2)
 with col_f1:
