@@ -97,13 +97,13 @@ margen_enmarcado = st.checkbox("🔲 Añadir margen blanco perimetral para facil
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- MODO RECICLAJE: CARTA COMPLETA DE COLORES DMC ---
+# --- MODO RECICLAJE: CARTA COMPLETA DE COLORES DMC ENUMERADOS ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### ♻️ Modo Reciclaje: Mis Colores Disponibles")
-st.markdown("<p style='color: #DDDDDD;'>Selecciona los códigos DMC que ya tienes guardados en casa de la carta completa:</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #DDDDDD;'>Selecciona los códigos DMC que ya tienes guardados en casa de la carta completa (enumerados del 1 al 454):</p>", unsafe_allow_html=True)
 
-# Lista completa oficial de la carta de colores DMC (todos los tonos existentes)
-lista_colores_dmc = [
+# Lista completa oficial de la carta de colores DMC numerada individualmente
+brutos_dmc = [
     "DMC BLANC (White)", "DMC B5200 (Snow White)", "DMC ECRU (Ecru)",
     "DMC 01 (White Tin)", "DMC 02 (Tin)", "DMC 03 (Medium Tin)", "DMC 04 (Dark Tin)",
     "DMC 05 (Light Driftwood)", "DMC 06 (Medium Light Driftwood)", "DMC 07 (Driftwood)", "DMC 08 (Dark Driftwood)", "DMC 09 (Very Dark Cocoa)",
@@ -173,7 +173,7 @@ lista_colores_dmc = [
     "DMC 3753 (Baby Blue ULT VY LT)", "DMC 3755 (Baby Blue)", "DMC 3756 (Baby Blue ULT VY LT)", "DMC 3760 (Wedgewood MED)", "DMC 3761 (Sky Blue LT)", "DMC 3765 (Peacock Blue VY LT)", "DMC 3766 (Peacock Blue LT)",
     "DMC 3770 (Tawny VY LT)", "DMC 3771 (Terra Cotta LT)", "DMC 3772 (Terra Cotta VY DK)", "DMC 3773 (Desert Sand MED)", "DMC 3774 (Desert Sand VY LT)", "DMC 3776 (Mahogany DK)", "DMC 3778 (Terra Cotta VY LT)",
     "DMC 3779 (Terracotta VY LT)", "DMC 3781 (Mocha Brown DK)", "DMC 3782 (Mocha Brown LT)", "DMC 3787 (Brown Gray DK)", "DMC 3790 (Beige Gray ULT DK)", "DMC 3799 (Pewter Grey VY DK)",
-    "DMC 3801 (Christmas Red LT)", "DMC 3802 (Antique Mauve VY DK)", "DMC 3803 (Mauve VY DK)", "DMC 3804 (Cyclamen PK DK)", "DMC 3805 (Cyclamen PK)", "DMC 3806 (Cyclamen PK LT)", "DMC 3807 (Cornflower Blue",
+    "DMC 3801 (Christmas Red LT)", "DMC 3802 (Antique Mauve VY DK)", "DMC 3803 (Mauve VY DK)", "DMC 3804 (Cyclamen PK DK)", "DMC 3805 (Cyclamen PK)", "DMC 3806 (Cyclamen PK LT)", "DMC 3807 (Cornflower Blue)",
     "DMC 3808 (Teal Green ULT VY DK)", "DMC 3809 (Teal Green VY DK)", "DMC 3810 (Teal Green DK)", "DMC 3811 (Turquoise VY LT)", "DMC 3812 (Seagreen VY DK)", "DMC 3813 (Blue Green LT)", "DMC 3814 (Aquamarine)",
     "DMC 3815 (Celadon Green DK)", "DMC 3816 (Celadon Green)", "DMC 3817 (Celadon Green LT)", "DMC 3818 (Emerald Green ULT VY DK)", "DMC 3819 (Moss Green LT)", "DMC 3820 (Straw DK)", "DMC 3821 (Straw)",
     "DMC 3822 (Straw LT)", "DMC 3823 (Yellow ULT PALE)", "DMC 3824 (Apricot LT)", "DMC 3825 (Pumpkin PALE)", "DMC 3826 (Golden Brown)", "DMC 3827 (Golden Brown PALE)", "DMC 3828 (Hazelnut Brown)",
@@ -185,7 +185,10 @@ lista_colores_dmc = [
     "DMC 3865 (Winter White)", "DMC 3866 (Mocha Brown ULT VY LT)"
 ]
 
-colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc, default=["DMC 310 (Black)", "DMC B5200 (Snow White)"])
+# Generación automática de la lista enumerada del 1 al 454
+lista_colores_dmc = [f"{i+1}. {color}" for i, color in enumerate(brutos_dmc)]
+
+colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc, default=["1. DMC BLANC (White)", "106. DMC 310 (Black)"])
 
 # --- SECCIÓN DE COMENTARIOS Y RESEÑAS (OBLIGATORIA ANTES DE DESCARGAR) ---
 st.markdown("---")
@@ -194,8 +197,8 @@ st.markdown("<p style='color: #CCCCCC;'>¡Nos encanta mejorar! Por favor, <b>dej
 
 if 'comentarios' not in st.session_state:
     st.session_state.comentarios = [
-        ("María", "¡Muchísimas gracias por esta herramienta tan útil! El modo reciclaje con toda la carta DMC es increíble 💎"),
-        ("Carlos", "Excelente aplicación, muy completa para organizar todos los hilos y hincarle el diente a los lienzos.")
+        ("María", "¡Muchísimas gracias por esta herramienta tan útil! El modo reciclaje con toda la carta DMC enumerada es increíble 💎"),
+        ("Carlos", "Excelente aplicación, muy completa para organizar todos los hilos perfectamente enumerados.")
     ]
 
 if 'reseña_hecha' not in st.session_state:
@@ -241,7 +244,7 @@ if archivo_subido is not None:
         st.image(imagen_mini, caption=f"🎨 Vista Mosaico ({tipo_diamante} - {tamanio_lienzo})", use_column_width=True)
     
     st.markdown("### 🌈 Inventario de Colores DMC y Viabilidad Eco")
-    st.info(f"💡 **Resultado de tu caja:** Has seleccionado **{len(colores_usuario)} colores** de tu inventario personal para este proyecto.")
+    st.info(f"💡 **Resultado de tu caja:** Has seleccionado **{len(colores_usuario)} colores** enumerados de tu inventario personal para este proyecto.")
 
     # Restricción de descarga basada en la reseña
     if st.session_state.reseña_hecha:
