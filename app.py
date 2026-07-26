@@ -10,49 +10,50 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- ESTILOS CSS CON TEXTOS OSCUROS Y LEGIBLES ---
+# --- ESTILOS CSS CON FONDO OSCURO Y VIBRANTE ---
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(135deg, #FF9A8E 0%, #FECFEF 50%, #A1C4FD 100%);
+    background: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
     background-attachment: fixed;
 }
 .brand-container {
     text-align: center;
-    padding: 25px 10px;
-    background: rgba(255, 255, 255, 0.9);
+    padding: 30px 10px;
+    background: rgba(15, 15, 25, 0.85);
+    border: 2px solid #FF007F;
     border-radius: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     margin-bottom: 25px;
 }
 .brand-title {
     font-size: 3rem;
     font-weight: 900;
-    background: linear-gradient(45deg, #FF007F, #7928CA, #0070F3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #FFFFFF;
+    text-shadow: 0 0 15px #FF007F, 0 0 30px #7928CA;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
 }
 .brand-badge {
     display: inline-block;
-    background: #FFF0F5;
-    border: 2px solid #FF416C;
+    background: linear-gradient(90deg, #FF007F, #7928CA);
     padding: 6px 22px;
     border-radius: 25px;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #C70039;
+    color: #FFFFFF;
     margin-top: 5px;
-    box-shadow: 0 5px 15px rgba(255, 65, 108, 0.2);
+    box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
 }
 .canvas-box {
-    background-color: rgba(255, 255, 255, 0.95);
-    border: none;
+    background-color: rgba(25, 25, 35, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 22px;
     padding: 30px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
     margin-top: 20px;
+}
+h2, p, label {
+    color: #FFFFFF !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -67,8 +68,8 @@ st.markdown("""
 
 # --- SECCIÓN PRINCIPAL: CARGADOR Y CONFIGURACIÓN ---
 st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
-st.markdown("<h2 style='color: #FF1493; text-align: center; margin-top: 0;'>🖼️ Crea tu Patrón de Diamond Painting</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #333333; font-size: 1.1rem; font-weight: 500;'>Sube tu foto favorita y conviértela en un mosaico vibrante con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
+st.markdown("<h2 style='color: #FF69B4; text-align: center; margin-top: 0;'>🖼️ Crea tu Patrón de Diamond Painting</h2>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #E0E0E0; font-size: 1.1rem;'>Sube tu foto favorita y conviértela en un mosaico vibrante con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
 
 # 1. Selector de archivo
 archivo_subido = st.file_uploader("Elige una imagen alegre (JPG, PNG)", type=["jpg", "jpeg", "png"])
@@ -121,4 +122,4 @@ else:
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #2C3E50; font-weight: 700;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #FFFFFF; font-weight: 600;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
