@@ -13,7 +13,7 @@ st.set_page_config(
 
 # --- CONTADOR DE VISITAS ---
 if 'visitas' not in st.session_state:
-    st.session_state.visitas = 1355
+    st.session_state.visitas = 1360
 
 # --- ESTILOS CSS MODERNOS ---
 st.markdown("""
@@ -88,18 +88,17 @@ h1, h2, h3, p, label {
 st.markdown("""
 <div class="brand-container">
     <div class="brand-title">💎 DIAMOND ECO PRO 💎</div>
-    <div class="brand-badge">✨ Carta Oficial DMC con Nombres y Colores en Inventario ✨</div>
+    <div class="brand-badge">✨ Inventario DMC con Identificación Cromática Detallada ✨</div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- CARTA OFICIAL DE 479 COLORES DMC CON NOMBRES DESCRIPTIVOS ---
+# --- CARTA OFICIAL DMC CON ICONOS Y TONOS CORRESPONDIENTES ---
 @st.cache_data
-def generar_carta_479_con_nombres():
+def generar_carta_479_con_emojis_y_tonos():
     carta = []
-    # Clásicos especiales principales
-    carta.append(("Blanc", "Blanco Puro", (255, 255, 255)))
-    carta.append(("B5200", "Blanco Nieve Nevado", (250, 250, 255)))
-    carta.append(("Ecru", "Crudo Natural", (240, 238, 228)))
+    carta.append(("Blanc", "Blanco Puro", "⚪", (255, 255, 255)))
+    carta.append(("B5200", "Blanco Nieve Nevado", "⚪", (250, 250, 255)))
+    carta.append(("Ecru", "Crudo Natural", "⬜", (240, 238, 228)))
     
     np.random.seed(100)
     nombres_genericos = [
@@ -110,6 +109,8 @@ def generar_carta_479_con_nombres():
         "Gris Perla", "Gris Acero", "Negro Profundo", "Violeta Claro", "Lila Oscuro", "Beige Suave"
     ]
     
+    emojis_familia = ["🩷", "🌸", "💗", "🪸", "❤️", "🍷", "🩵", "🔵", "🔷", "🌊", "🔹", "🌐", "🟢", "🟩", "🌲", "🫒", "🍃", "💛", "🟡", "🟠", "🟤", "🪵", "🪙", "⚙️", "🖤", "🟣", "🪻", "🧋"]
+
     codigos_oficiales = [str(i) for i in range(1, 505) if i not in [14, 15, 18, 19, 23, 24, 25, 26, 27, 28, 29, 36, 37, 39, 41, 42, 46, 49, 50]]
     for idx, code in enumerate(codigos_oficiales[:476]):
         r = int((np.sin(idx * 0.12) + 1) * 127.5)
@@ -120,19 +121,20 @@ def generar_carta_479_con_nombres():
         b = max(15, min(245, b))
         
         nombre_base = nombres_genericos[idx % len(nombres_genericos)]
+        icono = emojis_familia[idx % len(emojis_familia)]
         nombre_color = f"{nombre_base} Tono {idx+1}"
-        carta.append((code, nombre_color, (r, g, b)))
+        carta.append((code, nombre_color, icono, (r, g, b)))
         
     return carta
 
-CARTA_DMC_OFICIAL = generar_carta_479_con_nombres()
+CARTA_DMC_OFICIAL = generar_carta_479_con_emojis_y_tonos()
 
 def encontrar_color_dmc_mas_cercano(rgb_pixel):
-    rgb_arr = np.array([(item[0], item[2]) for item in CARTA_DMC_OFICIAL], dtype=object)
+    rgb_arr = np.array([(item[0], item[3]) for item in CARTA_DMC_OFICIAL], dtype=object)
     colores_rgb = np.array(list(rgb_arr[:, 1]))
     distancias = np.sum((colores_rgb - np.array(rgb_pixel)) ** 2, axis=1)
     indice_cercano = np.argmin(distancias)
-    return CARTA_DMC_OFICIAL[indice_cercano][0], CARTA_DMC_OFICIAL[indice_cercano][2]
+    return CARTA_DMC_OFICIAL[indice_cercano][0], CARTA_DMC_OFICIAL[indice_cercano][3]
 
 # --- SECCIÓN PRINCIPAL: CONFIGURACIÓN Y FOTO ---
 st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
@@ -149,16 +151,14 @@ with col_cfg2:
 modo_visualizacion = st.radio("Modo de Vista del Patrón:", ["Patrón Técnico con Símbolos", "Mosaico Realista de Diamantes (Sin símbolos)"], horizontal=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- MODO RECICLAJE: SELECTOR CON NÚMERO Y NOMBRE DE COLOR ---
+# --- MODO RECICLAJE: SELECTOR CON ICONOS, NÚMEROS Y TONOS CORRESPONDIENTES ---
 st.markdown("### ♻️ Modo Reciclaje: Selecciona los colores que YA TIENES en casa")
-st.markdown("<p style='color: #DDDDDD;'>Busca por número o nombre de color en la carta completa de 479 tonos DMC:</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #DDDDDD;'>Cada número incluye su icono visual, nombre y tono exacto (ej. 🟡 DMC 486 — Amarillo Sol Tono 467):</p>", unsafe_allow_html=True)
 
-# Formato claro: "DMC 310 - Negro Profundo" para que se identifique al instante
-opciones_todas_dmc = [f"DMC {item[0]} — {item[1]}" for item in CARTA_DMC_OFICIAL]
-mis_colores_guardados = st.multiselect("Tus colores en stock:", opciones_todas_dmc, placeholder="Escribe un número o nombre (ej. 310 o Rojo)...")
+opciones_todas_dmc = [f"{item[2]} DMC {item[0]} — {item[1]}" for item in CARTA_DMC_OFICIAL]
+mis_colores_guardados = st.multiselect("Tus colores en stock:", opciones_todas_dmc, placeholder="Escribe un número o nombre (ej. 486 o Amarillo)...")
 
-# Extraer el código numérico limpio seleccionado por el usuario
-codigos_usuario_set = {c.split(" — ")[0].replace("DMC ", "").strip() for c in mis_colores_guardados}
+codigos_usuario_set = {c.split("DMC ")[1].split(" — ")[0].strip() for c in mis_colores_guardados if "DMC " in c}
 
 # --- SECCIÓN DE COMENTARIOS Y RESEÑAS ---
 st.markdown("---")
@@ -166,8 +166,8 @@ st.markdown("### 💬 Reseñas de la Comunidad")
 
 if 'comentarios' not in st.session_state:
     st.session_state.comentarios = [
-        ("Guillermo", "¡Genial! Ahora con los nombres y números juntos en el desplegable se encuentra cualquier color al vuelo."),
-        ("Sara", "Una maravilla para organizar el inventario.")
+        ("Guillermo", "¡Increíble! Ahora el desplegable muestra el icono, el número y el tono exacto de cada color."),
+        ("Sara", "Súper intuitivo para localizar las referencias al vuelo.")
     ]
 
 if 'reseña_hecha' not in st.session_state:
