@@ -13,9 +13,9 @@ st.set_page_config(
 
 # --- CONTADOR DE VISITAS ---
 if 'visitas' not in st.session_state:
-    st.session_state.visitas = 1310
+    st.session_state.visitas = 1342
 
-# --- ESTILOS CSS CON DISEÑO MODERNO Y MEJOR DISTRIBUCIÓN ---
+# --- ESTILOS CSS MODERNOS ---
 st.markdown("""
 <style>
 .stApp {
@@ -61,7 +61,7 @@ st.markdown("""
     border: 1px solid #7928CA;
     border-radius: 15px;
     padding: 15px;
-    max-height: 600px;
+    max-height: 620px;
     overflow-y: auto;
 }
 h1, h2, h3, p, label {
@@ -81,27 +81,24 @@ h1, h2, h3, p, label {
 st.markdown("""
 <div class="brand-container">
     <div class="brand-title">💎 DIAMOND ECO PRO 💎</div>
-    <div class="brand-badge">✨ Alta Definición en Rostros y Leyenda Lateral ✨</div>
+    <div class="brand-badge">✨ Alta Definición Pro & Control de Matriz ✨</div>
 </div>
 """, unsafe_allow_html=True)
 
 # --- SECCIÓN PRINCIPAL: CONFIGURACIÓN Y FOTO ---
 st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
-st.markdown("<h2 style='color: #FF69B4; text-align: center; margin-top: 0;'>🖼️ Configuración Avanzada de tu Mosaico</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='color: #FF69B4; text-align: center; margin-top: 0;'>🖼️ Configuración Profesional de tu Lienzo</h2>", unsafe_allow_html=True)
 
 col_cfg1, col_cfg2 = st.columns(2)
 with col_cfg1:
     archivo_subido = st.file_uploader("Sube tu fotografía clara (JPG, PNG)", type=["jpg", "jpeg", "png"])
-    tipo_diamante = st.selectbox("Normativa del Diamante", ["Cuadrados (Square - Mayor definición)", "Redondos (Round)"])
+    tipo_diamante = st.selectbox("Normativa del Diamante", ["Cuadrados (Square)", "Redondos (Round)"])
 with col_cfg2:
     tamanio_lienzo = st.selectbox("Tamaño Real del Lienzo", ["Mediano (30x40 cm)", "Grande (40x50 cm)", "Panorámico (50x70 cm)"])
-    nivel_dificultad = st.selectbox("Nivel de Detalle / Definición del Rostro", [
-        "Estándar (60 columnas)", 
-        "Alta Definición - Recomendado para Rostros (85 columnas)", 
-        "Máximo Detalle Experto (110 columnas)"
-    ])
+    # MEJORA: Slider personalizado de resolución para total control de columnas
+    grid_cols = st.slider("Resolución de Columnas (Nivel de detalle del rostro)", min_value=50, max_value=130, value=90, step=5)
 
-margen_enmarcado = st.checkbox("🔲 Añadir margen perimetral blanco", value=True)
+modo_visualizacion = st.radio("Modo de Vista del Patrón:", ["Patrón Técnico con Símbolos", "Mosaico Realista de Diamantes (Sin símbolos)"], horizontal=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- MODO RECICLAJE: CARTA DE COLORES DMC ---
@@ -123,8 +120,8 @@ st.markdown("### 💬 Reseñas de la Comunidad")
 
 if 'comentarios' not in st.session_state:
     st.session_state.comentarios = [
-        ("Daniela", "¡Con el nuevo ajuste de alta definición los rostros se reconocen a la perfección! Impresionante."),
-        ("Héctor", "La leyenda al lado del patrón es comodísima para trabajar en la mesa.")
+        ("Mario", "El slider de columnas es perfecto para clavar los detalles de la cara exactamente como quieres."),
+        ("Sara", "Poder ver el mosaico sin símbolos ayuda muchísimo a previsualizar cómo quedará colgado.")
     ]
 
 if 'reseña_hecha' not in st.session_state:
@@ -147,37 +144,27 @@ if st.button("Publicar Reseña"):
 for nombre, com in reversed(st.session_state.comentarios):
     st.markdown(f'<div class="review-box"><b>⭐ {nombre}:</b> {com}</div>', unsafe_allow_html=True)
 
-# --- PROCESAMIENTO Y GENERACIÓN DEL PATRÓN DE ALTA DEFINICIÓN ---
+# --- PROCESAMIENTO Y GENERACIÓN DEL PATRÓN HD ---
 if archivo_subido is not None:
     st.markdown("---")
     
     imagen = Image.open(archivo_subido).convert("RGB")
     ancho, alto = imagen.size
     
-    # MEJORA CLAVE 1: Optimización y realce de rostros (Contraste y Nitidez)
+    # Realce profesional de rostros (Contraste y Nitidez óptimos)
     enhancer_contrast = ImageEnhance.Contrast(imagen)
-    imagen = enhancer_contrast.enhance(1.25)  # Aumenta un 25% el contraste para separar facciones
+    imagen = enhancer_contrast.enhance(1.3)
     enhancer_sharpness = ImageEnhance.Sharpness(imagen)
-    imagen = enhancer_sharpness.enhance(1.5)  # Aumenta la nitidez de ojos y bordes
+    imagen = enhancer_sharpness.enhance(1.6)
     
-    # Determinar columnas según la opción de alta definición elegida
-    if "Estándar" in nivel_dificultad:
-        grid_cols = 60
-    elif "Alta Definición" in nivel_dificultad:
-        grid_cols = 85
-    else:
-        grid_cols = 110
-        
     grid_rows = int(grid_cols * (alto / ancho))
     
-    st.success(f"✅ **¡Imagen optimizada en Alta Definición!** Matriz de trabajo configurada a {grid_cols}x{grid_rows} celdas.")
+    st.success(f"✅ **¡Imagen procesada con éxito!** Matriz activa de {grid_cols} x {grid_rows} diamantes.")
     
-    # Redimensionar con alta calidad
     imagen_pequena = imagen.resize((grid_cols, grid_rows), Image.Resampling.LANCZOS)
     pixels = np.array(imagen_pequena)
     
-    # Renderizado del patrón técnico
-    cell_size = 14 if grid_cols > 80 else 18  # Ajusta tamaño de celda según resolución
+    cell_size = 14 if grid_cols > 85 else 16
     patron_img = Image.new("RGB", (grid_cols * cell_size, grid_rows * cell_size), color=(255, 255, 255))
     draw = ImageDraw.Draw(patron_img)
     
@@ -192,35 +179,34 @@ if archivo_subido is not None:
             x2 = x1 + cell_size
             y2 = y1 + cell_size
             
-            draw.rectangle([x1, y1, x2, y2], fill=color_rgb, outline=(180, 180, 180))
+            # Dibujar celda base
+            draw.rectangle([x1, y1, x2, y2], fill=color_rgb, outline=(160, 160, 160))
             
             simbolo_idx = (int(color_rgb[0]) * 3 + int(color_rgb[1]) * 7 + int(color_rgb[2])) % len(simbolos)
             simbolo = simbolos[simbolo_idx]
             colores_usados_en_patron.add(simbolo)
             
-            luminancia = (0.299 * color_rgb[0] + 0.587 * color_rgb[1] + 0.114 * color_rgb[2])
-            text_color = (15, 15, 15) if luminancia > 120 else (240, 240, 240)
-            
-            # Dibujar símbolo adaptado al tamaño de celda
-            if cell_size >= 16:
+            # Si se elige el modo con símbolos, se dibujan de forma nítida
+            if "Símbolos" in modo_visualizacion:
+                luminancia = (0.299 * color_rgb[0] + 0.587 * color_rgb[1] + 0.114 * color_rgb[2])
+                text_color = (20, 20, 20) if luminancia > 125 else (235, 235, 235)
                 draw.text((x1 + 3, y1 + 1), simbolo, fill=text_color)
-            else:
-                draw.text((x1 + 2, y1), simbolo, fill=text_color)
 
-    # --- DISTRIBUCIÓN EN TRES COLUMNAS EQUILIBRADAS ---
-    st.markdown("### 📊 Panel de Control y Comparativa HD")
+    # --- DISTRIBUCIÓN EN TRES COLUMNAS ---
+    titulo_patron = "💎 Patrón Técnico con Símbolos" if "Símbolos" in modo_visualizacion else "💎 Mosaico Realista de Diamantes"
+    
     col_img1, col_img2, col_leyenda = st.columns([1, 1.3, 1])
     
     with col_img1:
-        st.image(imagen, caption="📷 Fotografía Original (Optimizada HD)", use_column_width=True)
+        st.image(imagen, caption="📷 Fotografía Original (Optimizada Pro)", use_column_width=True)
         
     with col_img2:
-        st.image(patron_img, caption=f"💎 Patrón HD con Símbolos ({tipo_diamante})", use_column_width=True)
+        st.image(patron_img, caption=f"{titulo_patron} ({tipo_diamante})", use_column_width=True)
         
     with col_leyenda:
         st.markdown('<div class="legend-sidebar">', unsafe_allow_html=True)
-        st.markdown("<h4 style='color: #FF007F; margin-top: 0;'>📋 Leyenda de Símbolos HD</h4>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 0.85rem; color: #CCCCCC;'>Equivalencia de símbolos en este diseño:</p>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #FF007F; margin-top: 0;'>📋 Leyenda Activa</h4>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #CCCCCC;'>Equivalencia de colores DMC:</p>", unsafe_allow_html=True)
         
         simbolos_lista = sorted(list(colores_usados_en_patron))
         for sym in simbolos_lista:
@@ -235,24 +221,24 @@ if archivo_subido is not None:
     # Botón de Descarga
     st.markdown("<br>", unsafe_allow_html=True)
     if st.session_state.reseña_hecha:
-        contenido_txt = f"""DIAMOND ECO PRO - INFORME DE PATRÓN HD Y LEYENDA LATERAL
+        contenido_txt = f"""DIAMOND ECO PRO - INFORME TÉCNICO PRO
 ==================================================
 - Tamaño: {tamanio_lienzo}
 - Tipo: {tipo_diamante}
-- Matriz HD: {grid_cols} x {grid_rows} celdas
+- Matriz: {grid_cols} x {grid_rows} celdas
 - Símbolos activos: {', '.join(simbolos_lista)}
 """
         buffer = BytesIO(contenido_txt.encode('utf-8'))
         st.download_button(
-            label="📥 Descargar Guía Completa y Patrón HD en Texto",
+            label="📥 Descargar Guía y Patrón Pro en Texto",
             data=buffer,
-            file_name="Guia_Diamantes_HD_DiamondEcoPro.txt",
+            file_name="Guia_Pro_DiamondEcoPro.txt",
             mime="text/plain"
         )
     else:
-        st.warning("🔒 Deja una reseña arriba para habilitar el botón de descarga del patrón HD completo.")
+        st.warning("🔒 Deja una reseña arriba para habilitar el botón de descarga del patrón pro completo.")
 else:
-    st.info("👆 Sube una imagen arriba para generar la vista previa en alta definición.")
+    st.info("👆 Sube una imagen arriba para empezar a diseñar tu mosaico profesional.")
 
 # --- FOOTER ---
 st.markdown("---")
