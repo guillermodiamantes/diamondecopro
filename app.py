@@ -13,7 +13,7 @@ st.set_page_config(
 
 # --- CONTADOR DE VISITAS ---
 if 'visitas' not in st.session_state:
-    st.session_state.visitas = 1370
+    st.session_state.visitas = 0
 
 # --- ESTILOS CSS MODERNOS ---
 st.markdown("""
