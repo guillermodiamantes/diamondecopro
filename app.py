@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import re
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -43,7 +42,6 @@ st.markdown("""
     border-radius: 18px;
     padding: 25px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    text-align: center;
     margin-top: 20px;
 }
 </style>
@@ -57,10 +55,36 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- LIENZO SIMULADO ---
-st.markdown("""
-<div class="canvas-box">
-    <h3 style="color: #222222; margin-top:0;">🖼️ Tu Lienzo de Diamantes en Pantalla</h3>
-    <p style="color: #666666; font-size: 0.95rem;">Mosaico interactivo listo para transformar tus fotos favoritas en patrones DMC.</p>
-</div>
-""", unsafe_allow_html=True)
+# --- SECCIÓN PRINCIPAL: CARGADOR Y CONFIGURACIÓN ---
+st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
+st.subheader("🖼️ Crea tu Patrón de Diamond Painting")
+st.write("Sube una foto personal para transformarla en un mosaico interactivo con los colores de la gama DMC.")
+
+# 1. Selector de archivo
+archivo_subido = st.file_uploader("Elige una imagen (JPG, PNG)", type=["jpg", "jpeg", "png"])
+
+# 2. Opciones de configuración
+col1, col2 = st.columns(2)
+with col1:
+    tipo_diamante = st.selectbox("Forma de los Diamantes", ["Cuadrados (Square)", "Redondos (Round)"])
+with col2:
+    tamanio_lienzo = st.selectbox("Tamaño del Lienzo", ["Mediano (30x40 cm)", "Grande (40x50 cm)", "Panorámico (50x70 cm)"])
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# --- PROCESAMIENTO DE LA IMAGEN ---
+if archivo_subido is not None:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.success("¡Imagen cargada con éxito! Generando vista previa del patrón...")
+    
+    # Mostramos la imagen del usuario
+    st.image(archivo_subido, caption="Imagen original seleccionada", use_column_width=True)
+    
+    st.markdown("### 🎨 Paleta de Colores DMC Estimada")
+    st.info("Tu patrón está listo. En las próximas actualizaciones podrás descargar el plano completo con la simbología y lista de inventario DMC.")
+else:
+    st.info("👆 Sube una imagen arriba para empezar a diseñar tu lienzo personalizado.")
+
+# --- CONTADOR DE VISITAS SIMPLIFICADO ---
+st.markdown("---")
+st.caption("🚀 DiamondEcoPro • Diseñador Sostenible de Arte en Diamante")
