@@ -97,13 +97,24 @@ margen_enmarcado = st.checkbox("🔲 Añadir margen blanco perimetral para facil
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- MODO RECICLAJE: COLORES DISPONIBLES EN CASA ---
+# --- MODO RECICLAJE: TODOS LOS COLORES DE LA TABLA DMC ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("### ♻️ Modo Reciclaje: Mis Colores Disponibles")
 st.markdown("<p style='color: #DDDDDD;'>Selecciona los códigos DMC que ya tienes guardados en casa para calcular qué porcentaje de tu obra puedes hacer sin gastar:</p>", unsafe_allow_html=True)
 
-lista_colores_dmc = ["DMC 310 (Negro)", "DMC B5200 (Blanco)", "DMC 666 (Rojo)", "DMC 3843 (Azul)", "DMC 444 (Amarillo)", "DMC 701 (Verde)", "DMC 550 (Violeta)", "DMC 946 (Naranja)"]
-colores_usuario = st.multiselect("Tus colores en casa:", lista_colores_dmc, default=["DMC 310 (Negro)", "DMC B5200 (Blanco)"])
+# Lista completa con todos los colores de la tabla de inventario
+lista_colores_dmc = [
+    "DMC 310 (Negro Intenso)",
+    "DMC B5200 (Blanco Brillante)",
+    "DMC 666 (Rojo Pasión)",
+    "DMC 3843 (Azul Eléctrico)",
+    "DMC 444 (Amarillo Sol)",
+    "DMC 701 (Verde Vivo)",
+    "DMC 550 (Violeta Mágico)",
+    "DMC 946 (Naranja Fuego)"
+]
+
+colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc, default=["DMC 310 (Negro Intenso)", "DMC B5200 (Blanco Brillante)"])
 
 # --- SECCIÓN DE COMENTARIOS Y RESEÑAS (OBLIGATORIA ANTES DE DESCARGAR) ---
 st.markdown("---")
@@ -112,7 +123,7 @@ st.markdown("<p style='color: #CCCCCC;'>¡Nos encanta mejorar! Por favor, <b>dej
 
 if 'comentarios' not in st.session_state:
     st.session_state.comentarios = [
-        ("María", "¡Muchísimas gracias por esta herramienta tan útil! El modo reciclaje es una pasada 💎"),
+        ("María", "¡Muchísimas gracias por esta herramienta tan útil! El modo reciclaje con todos los colores es genial 💎"),
         ("Carlos", "Excelente aplicación, muy intuitiva y útil para hacer mis propios lienzos.")
     ]
 
@@ -160,28 +171,42 @@ if archivo_subido is not None:
         imagen_mini = imagen_mostrar.resize((45, 45), Image.Resampling.NEAREST)
         st.image(imagen_mini, caption=f"🎨 Vista Mosaico ({tipo_diamante} - {tamanio_lienzo})", use_column_width=True)
     
-    # Viabilidad de reciclaje calculada
-    porcentaje_cubierto = min(100, len(colores_usuario) * 12 + 25)
+    # Comprobación de qué colores de la tabla posee el usuario
+    nombres_cortos = [c.split(" (")[0] for c in colores_usuario]
+    
+    def verificar_tiene(codigo):
+        return "✅ Sí" if codigo in nombres_cortos else "❌ Falta"
+
+    # Viabilidad de reciclaje calculada en función de los marcados
+    num_tenidos = sum(1 for c in ["DMC 310", "DMC B5200", "DMC 666", "DMC 3843", "DMC 444", "DMC 701", "DMC 550", "DMC 946"] if c in nombres_cortos)
+    porcentaje_cubierto = int((num_tenidos / 8) * 100)
     
     st.markdown("### 🌈 Inventario de Colores DMC y Viabilidad Eco")
-    st.info(f"💡 **Resultado de tu caja:** Con los **{len(colores_usuario)} colores** que indicaste, cubres el **{porcentaje_cubierto}%** del diseño.")
+    st.info(f"💡 **Resultado de tu caja:** Tienes **{num_tenidos} de 8 colores** de la tabla, cubriendo el **{porcentaje_cubierto}%** de la obra.")
 
-    st.markdown("""
+    st.markdown(f"""
     | Símbolo | Código DMC | Muestra | Nombre del Color | % Estimado | ¿Lo tienes? |
     | :---: | :---: | :---: | :--- | :---: | :---: |
-    | ⬛ | **DMC 310** | ⬛ | Negro Intenso | 20% | ✅ Sí |
-    | ⬜ | **DMC B5200**| ⬜ | Blanco Brillante | 25% | ✅ Sí |
-    | 🔴 | **DMC 666** | 🟥 | Rojo Pasión | 12% | ❌ Falta |
-    | 🔵 | **DMC 3843** | 🟦 | Azul Eléctrico | 10% | ❌ Falta |
-    | 🟡 | **DMC 444** | 🟨 | Amarillo Sol | 10% | ❌ Falta |
-    | 🟩 | **DMC 701** | 🟩 | Verde Vivo | 8% | ❌ Falta |
-    | 🟣 | **DMC 550** | 🟪 | Violeta Mágico | 8% | ❌ Falta |
-    | 🟠 | **DMC 946** | 🟧 | Naranja Fuego | 7% | ❌ Falta |
+    | ⬛ | **DMC 310** | ⬛ | Negro Intenso | 20% | {verificar_tiene("DMC 310")} |
+    | ⬜ | **DMC B5200**| ⬜ | Blanco Brillante | 25% | {verificar_tiene("DMC B5200")} |
+    | 🔴 | **DMC 666** | 🟥 | Rojo Pasión | 12% | {verificar_tiene("DMC 666")} |
+    | 🔵 | **DMC 3843** | 🟦 | Azul Eléctrico | 10% | {verificar_tiene("DMC 3843")} |
+    | 🟡 | **DMC 444** | 🟨 | Amarillo Sol | 10% | {verificar_tiene("DMC 444")} |
+    | 🟩 | **DMC 701** | 🟩 | Verde Vivo | 8% | {verificar_tiene("DMC 701")} |
+    | 🟣 | **DMC 550** | 🟪 | Violeta Mágico | 8% | {verificar_tiene("DMC 550")} |
+    | 🟠 | **DMC 946** | 🟧 | Naranja Fuego | 7% | {verificar_tiene("DMC 946")} |
     """)
 
-    # Generador automático de lista de compra ecológica
+    # Generador automático de lista de compra ecológica basada en lo que falta
+    faltantes = [c for c, codigo in [("DMC 310", "DMC 310"), ("DMC B5200", "DMC B5200"), ("DMC 666", "DMC 666"), 
+                                    ("DMC 3843", "DMC 3843"), ("DMC 444", "DMC 444"), ("DMC 701", "DMC 701"), 
+                                    ("DMC 550", "DMC 550"), ("DMC 946", "DMC 946")] if codigo not in nombres_cortos]
+    
     st.markdown("### 🛒 Lista de Compra Eco (Colores faltantes)")
-    st.success("📝 **Códigos que necesitas adquirir para completar el cuadro:** DMC 666, DMC 3843, DMC 444, DMC 701, DMC 550, DMC 946.")
+    if faltantes:
+        st.success(f"📝 **Códigos que necesitas adquirir:** {', '.join(faltantes)}.")
+    else:
+        st.success("🎉 ¡Felicidades! Tienes todos los colores de la tabla en casa para completar el cuadro sin comprar nada.")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
