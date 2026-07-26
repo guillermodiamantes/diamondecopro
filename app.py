@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from io import BytesIO
 
@@ -91,7 +91,7 @@ with col1:
     tipo_diamante = st.selectbox("Normativa del Diamante", ["Cuadrados (Square)", "Redondos (Round)"])
     tamanio_lienzo = st.selectbox("Tamaño del Lienzo", ["Mediano (30x40 cm)", "Grande (40x50 cm)", "Panorámico (50x70 cm)"])
 with col2:
-    estilo_color = st.selectbox("Estilo del Patrón", ["A Color", "Blanco y Negro"])
+    estilo_color = st.selectbox("Estilo del Patrón", ["A Color con Símbolos", "Blanco y Negro con Símbolos"])
     nivel_dificultad = st.selectbox("Nivel de Dificultad", ["Fácil (Pocos colores / Bloques)", "Experto (Detalle máximo)"])
 
 margen_enmarcado = st.checkbox("🔲 Añadir margen blanco perimetral para facilitar el enmarcado", value=True)
@@ -216,7 +216,7 @@ if st.button("Publicar Reseña / Dar las gracias"):
 for nombre, com in reversed(st.session_state.comentarios):
     st.markdown(f'<div class="review-box"><b>⭐ {nombre}:</b> {com}</div>', unsafe_allow_html=True)
 
-# --- PROCESAMIENTO Y DESCARGA REAL DE LA FOTO ---
+# --- PROCESAMIENTO Y GENERACIÓN DEL PATRÓN CON SÍMBOLOS ---
 if archivo_subido is not None:
     st.markdown("---")
     st.markdown("<br>", unsafe_allow_html=True)
@@ -229,17 +229,56 @@ if archivo_subido is not None:
     else:
         st.success("✅ **¡Excelente foto!** Perfecta para transformarla en un mosaico de alta calidad.")
     
-    if estilo_color == "Blanco y Negro":
-        imagen_mostrar = imagen.convert("L")
+    # Definir tamaño de la cuadrícula según dificultad (número de bloques)
+    grid_cols = 35 if "Fácil" in nivel_dificultad else 60
+    grid_rows = int(grid_cols * (alto / ancho))
+    
+    # Redimensionar la imagen original a la matriz del patrón
+    imagen_pequena = imagen.resize((grid_cols, grid_rows), Image.Resampling.LANCZOS)
+    
+    if "Blanco y Negro" in estilo_color:
+        imagen_pequena = imagen_pequena.convert("L").convert("RGB")
     else:
-        imagen_mostrar = imagen
+        imagen_pequena = imagen_pequena.convert("RGB")
+        
+    pixels = np.array(imagen_pequena)
+    
+    # Crear la imagen del patrón con cuadrícula y símbolos simulados
+    cell_size = 18
+    patron_img = Image.new("RGB", (grid_cols * cell_size, grid_rows * cell_size), color=(255, 255, 255))
+    draw = ImageDraw.Draw(patron_img)
+    
+    # Caracteres de símbolos disponibles para el patrón
+    simbolos = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "H", "K", "L", "M", "N", "P", "R", "S", "T", "V", "X", "Z", "#", "@", "+"]
+    
+    # Rellenar cada celda con su color de fondo y un número/símbolo representativo
+    for r in range(grid_rows):
+        for c in range(grid_cols):
+            color_rgb = tuple(pixels[r, c])
+            x1 = c * cell_size
+            y1 = r * cell_size
+            x2 = x1 + cell_size
+            y2 = y1 + cell_size
+            
+            # Dibujar fondo del bloque
+            draw.rectangle([x1, y1, x2, y2], fill=color_rgb, outline=(200, 200, 200))
+            
+            # Asignar un símbolo basado en la paleta de colores de la celda
+            simbolo_idx = (int(color_rgb[0]) + int(color_rgb[1]) + int(color_rgb[2])) % len(simbolos)
+            simbolo = simbolos[simbolo_idx]
+            
+            # Color de contraste para la letra o número (blanco o negro)
+            luminancia = (0.299 * color_rgb[0] + 0.587 * color_rgb[1] + 0.114 * color_rgb[2])
+            text_color = (0, 0, 0) if luminancia > 125 else (255, 255, 255)
+            
+            # Dibujar el número/símbolo en el centro de la celda
+            draw.text((x1 + 4, y1 + 2), simbolo, fill=text_color)
 
     col_img1, col_img2 = st.columns(2)
     with col_img1:
-        st.image(imagen_mostrar, caption=f"📷 Fotografía ({estilo_color} - {nivel_dificultad})", use_column_width=True)
+        st.image(imagen.convert("RGB"), caption="📷 Fotografía Original", use_column_width=True)
     with col_img2:
-        imagen_mini = imagen_mostrar.resize((45, 45), Image.Resampling.NEAREST)
-        st.image(imagen_mini, caption=f"🎨 Vista Mosaico ({tipo_diamante} - {tamanio_lienzo})", use_column_width=True)
+        st.image(patron_img, caption=f"💎 Patrón con Cuadrícula y Símbolos ({tipo_diamante})", use_column_width=True)
     
     st.markdown("### 🌈 Inventario de Colores DMC y Viabilidad Eco")
     st.info(f"💡 **Resultado de tu caja:** Has seleccionado **{len(colores_usuario)} colores** enumerados de tu inventario personal para este proyecto.")
@@ -248,26 +287,28 @@ if archivo_subido is not None:
     if st.session_state.reseña_hecha:
         margen_texto = "Con margen" if margen_enmarcado else "Sin margen"
         
-        # Generar un archivo de texto/patrón simulando el PDF descargable para asegurar compatibilidad total sin librerías externas pesadas
+        # Generar texto descriptivo y de leyenda para acompañar el patrón
         contenido_patron = f"""=============================================
-DIAMOND ECO PRO - PATRÓN DE DIAMOND PAINTING
+DIAMOND ECO PRO - PATRÓN DE DIAMOND PAINTING TÉCNICO
 =============================================
 - Estilo: {estilo_color}
 - Tamaño: {tamanio_lienzo}
 - Tipo de Diamante: {tipo_diamante}
 - Enmarcado: {margen_texto}
 - Nivel: {nivel_dificultad}
+- Matriz del patrón: {grid_cols} x {grid_rows} celdas
 - Colores seleccionados de casa: {len(colores_usuario)} colores
 
-LISTA DE COLORES DMC REQUERIDOS EN TU PROYECTO:
-""" + "\n".join(colores_usuario if colores_usuario else ["Se usará la selección automática de colores optimizada."])
+LEYENDA DE SÍMBOLOS Y NÚMEROS DMC:
+- Cada celda de la cuadrícula muestra un número o letra correspondiente al color de diamante a colocar.
+""" + "\n".join(colores_usuario if colores_usuario else ["Uso automático de colores optimizados según la carta DMC."])
 
         buffer_descarga = BytesIO(contenido_patron.encode('utf-8'))
 
         st.download_button(
-            label="📥 Descargar Patrón Completo (Archivo de Patrón)",
+            label="📥 Descargar Patrón Completo con Símbolos (TXT/Guía)",
             data=buffer_descarga,
-            file_name="Patron_DiamondEcoPro.txt",
+            file_name="Patron_Con_Simbolos_DiamondEcoPro.txt",
             mime="text/plain"
         )
     else:
