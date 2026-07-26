@@ -185,10 +185,10 @@ brutos_dmc = [
     "DMC 3865 (Winter White)", "DMC 3866 (Mocha Brown ULT VY LT)"
 ]
 
-# Generación automática de la lista enumerada del 1 al 454
+# Generación automática de la lista enumerada del 1 al 454 sin valores por defecto conflictivos
 lista_colores_dmc = [f"{i+1}. {color}" for i, color in enumerate(brutos_dmc)]
 
-colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc, default=["1. DMC BLANC (White)", "106. DMC 310 (Black)"])
+colores_usuario = st.multiselect("Tus colores en casa (Selecciona todos los que tengas):", lista_colores_dmc)
 
 # --- SECCIÓN DE COMENTARIOS Y RESEÑAS (OBLIGATORIA ANTES DE DESCARGAR) ---
 st.markdown("---")
