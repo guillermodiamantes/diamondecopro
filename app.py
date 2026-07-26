@@ -150,7 +150,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- LIENZO SIMULADO ---
-st.markdown('''
+st.markdown("""
 <div class="canvas-container">
     <h3 style="color: #222222; margin-top:0;">🖼️ Tu Lienzo de Diamantes en Pantalla</h3>
     <p style="color: #666666; font-size: 0.95rem;">Mosaico interactivo con colores de la gama oficial DMC</p>
@@ -165,7 +165,7 @@ st.markdown('''
         Convierte cualquier foto en un mapa de símbolos para diamantes cuadrados o redondos y aprovecha tus sobras de casa.
     </p>
 </div>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # --- PASO 1: SUBIDA Y CONFIGURACIÓN ---
 st.subheader("1. Configura tu Lienzo")
