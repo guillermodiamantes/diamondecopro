@@ -96,13 +96,11 @@ st.markdown("""
 @st.cache_data
 def generar_carta_479_dmc():
     carta = []
-    # Añadir los blancos y especiales clásicos
     carta.append(("Blanc", (255, 255, 255)))
     carta.append(("B5200", (250, 250, 255)))
     carta.append(("Ecru", (240, 238, 228)))
     
     np.random.seed(100)
-    # Generar de forma ordenada los 479 tonos numéricos oficiales estándar de la carta DMC
     codigos_oficiales = [str(i) for i in range(1, 505) if i not in [14, 15, 18, 19, 23, 24, 25, 26, 27, 28, 29, 36, 37, 39, 41, 42, 46, 49, 50]]
     for idx, code in enumerate(codigos_oficiales[:476]):
         r = int((np.sin(idx * 0.12) + 1) * 127.5)
@@ -144,7 +142,6 @@ st.markdown("<p style='color: #DDDDDD;'>Marca en este multiselector tus abalorio
 
 opciones_todas_dmc = [f"DMC {item[0]}" for item in CARTA_DMC_OFICIAL]
 mis_colores_guardados = st.multiselect("Tus colores en stock:", opciones_todas_dmc, placeholder="Busca o selecciona tus códigos DMC...")
-# Extraer solo los códigos limpios que el usuario seleccionó
 codigos_usuario_set = {c.replace("DMC ", "").strip() for c in mis_colores_guardados}
 
 # --- SECCIÓN DE COMENTARIOS Y RESEÑAS ---
@@ -184,7 +181,6 @@ if archivo_subido is not None:
     imagen = Image.open(archivo_subido).convert("RGB")
     ancho, alto = imagen.size
     
-    # Realce profesional de rostros
     enhancer_contrast = ImageEnhance.Contrast(imagen)
     imagen = enhancer_contrast.enhance(1.3)
     enhancer_sharpness = ImageEnhance.Sharpness(imagen)
@@ -248,7 +244,9 @@ if archivo_subido is not None:
             r, g, b = info["rgb"]
             hex_color = f"#{r:02x}{g:02x}{b:02x}"
             en_stock = dmc_code in codigos_usuario_set
-            estado_badge = "✅ En Casa" else "❌ Falta Comprar"
+            
+            # CORRECCIÓN DEL OPERADOR CONDICIONAL AQUÍ
+            estado_badge = "✅ En Casa" if en_stock else "❌ Falta Comprar"
             color_badge = "#00FFCC" if en_stock else "#FF4444"
             
             st.markdown(f"""
