@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- ESTILOS CSS VIBRANTES Y ALEGRES ---
+# --- ESTILOS CSS CON TEXTOS OSCUROS Y LEGIBLES ---
 st.markdown("""
 <style>
 .stApp {
@@ -20,7 +20,7 @@ st.markdown("""
 .brand-container {
     text-align: center;
     padding: 25px 10px;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     margin-bottom: 25px;
@@ -36,14 +36,15 @@ st.markdown("""
 }
 .brand-badge {
     display: inline-block;
-    background: linear-gradient(90deg, #FF416C, #FF4B2B);
+    background: #FFF0F5;
+    border: 2px solid #FF416C;
     padding: 6px 22px;
     border-radius: 25px;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #FFFFFF;
+    color: #C70039;
     margin-top: 5px;
-    box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+    box-shadow: 0 5px 15px rgba(255, 65, 108, 0.2);
 }
 .canvas-box {
     background-color: rgba(255, 255, 255, 0.95);
@@ -67,7 +68,7 @@ st.markdown("""
 # --- SECCIÓN PRINCIPAL: CARGADOR Y CONFIGURACIÓN ---
 st.markdown('<div class="canvas-box">', unsafe_allow_html=True)
 st.markdown("<h2 style='color: #FF1493; text-align: center; margin-top: 0;'>🖼️ Crea tu Patrón de Diamond Painting</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #555555; font-size: 1.1rem;'>Sube tu foto favorita y conviértela en un mosaico vibrante con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #333333; font-size: 1.1rem; font-weight: 500;'>Sube tu foto favorita y conviértela en un mosaico vibrante con la gama de colores DMC oficial.</p>", unsafe_allow_html=True)
 
 # 1. Selector de archivo
 archivo_subido = st.file_uploader("Elige una imagen alegre (JPG, PNG)", type=["jpg", "jpeg", "png"])
@@ -120,4 +121,4 @@ else:
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #FFFFFF; font-weight: 600;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #2C3E50; font-weight: 700;'>🚀 DiamondEcoPro • Arte, Color y Sostenibilidad</p>", unsafe_allow_html=True)
